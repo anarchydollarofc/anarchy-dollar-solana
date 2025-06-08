@@ -1,0 +1,19 @@
+# Caminho: /mnt/c/Users/Gabriel/solana_projects/ausd-confidential-program/Cargo.toml
+# Este é o Cargo.toml da RAIZ do seu WORKSPACE.
+# Ele define a estrutura do workspace e aplica patches globais de dependências.
+
+[workspace]
+# Define o resolvedor de dependências para a edição 2021 do Rust.
+resolver = "2"
+# Lista todos os membros (crates) que fazem parte deste workspace.
+# Inclui seu programa principal e as crates internas que replicam a arquitetura da Arcium.
+members = [
+    "programs/ausd-confidential-program",      # Seu programa principal Anchor.
+    "shared/ausd-types",                      # Crate de tipos e contas básicas.
+    "shared/ausd-derive",                     # Crate de macros derive.
+    "shared/ausd-proc-macros",                # Crate de macros de procedimento.
+    "shared/ausd-proc-macro-utils",           # Crate de utilitários para macros de procedimento.
+    "shared/ausd-computation",                # Crate para computações criptográficas.
+    "shared/ausd-utils",                      # Crate de utilitários gerais.
+]
+

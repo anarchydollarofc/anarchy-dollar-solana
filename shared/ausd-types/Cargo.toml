@@ -1,0 +1,31 @@
+# Caminho: shared/ausd-types/Cargo.toml
+# Crate de tipos de dados e contas básicas para o projeto aUSD.
+
+[package]
+name = "ausd-types"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = []
+mainnet = ["ausd-proc-macros/mainnet"]
+devnet = ["ausd-proc-macros/devnet"]
+accounts = []
+bytes = []
+tokens = ["spl-token", "spl-associated-token-account", "pyth-sdk-solana"]
+ausd-client = [] # Feature para código de cliente aUSD
+test-ausd = ["bytemuck"] # Feature para testes
+test-unit = []
+
+[dependencies]
+# Dependências conforme o monorepo Arcium/Elusiv, adaptadas para aUSD
+borsh = "0.10.3" # Versão Arcium
+bytemuck = { version = "1.14.0", optional = true } # Versão Arcium
+solana-program = "=1.18.26" # Versão Arcium
+spl-token = { version = "4.0.0", optional = true, features = ["no-entrypoint"] } # Versão Arcium
+spl-associated-token-account = { version = "2.0.0", optional = true, features = ["no-entrypoint"] } # Versão Arcium
+pyth-sdk-solana = { version = "0.4.2", optional = true } # Versão Arcium
+# Referências a outras crates locais do seu projeto aUSD (serão criadas posteriormente)
+ausd-derive = { path = "../ausd-derive", optional = true } 
+ausd-proc-macros = { path = "../ausd-proc-macros", optional = true } 

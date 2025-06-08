@@ -1,0 +1,21 @@
+# Caminho: shared/ausd-proc-macro-utils/Cargo.toml
+# Crate de utilitários para macros de procedimento para o projeto aUSD.
+
+[package]
+name = "ausd-proc-macro-utils"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+mainnet = []
+devnet = []
+
+[dependencies]
+# Dependências conforme o monorepo Arcium, adaptadas para aUSD
+proc-macro2 = "1.0.36" # Versão Arcium
+quote = "1.0.16"      # Versão Arcium
+serde = { version = "1.0.188", features = ["derive"] } # Versão Arcium
+syn = { version = "1.0.89", features = ["full", "fold"] } # Versão Arcium
+solana-program = "=1.18.26" # Versão Arcium
+toml = "0.5.9"        # Versão Arcium

@@ -1,0 +1,318 @@
+// Caminho: /mnt/c/Users/Gabriel/solana_projects/ausd-confidential-program/programs/ausd-confidential-program/src/lib.rs
+// ESTE É O ARQUIVO PRINCIPAL (LIB.RS) DO SEU PROGRAMA SOLANA "AUSD CONFIDENCIAL"!
+// ELE DEFINE AS INSTRUÇÕES ACESSÍVEIS PUBLICAMENTE E A ESTRUTURA BÁSICA DO PROGRAMA!
+
+USE ANCHOR_LANG::PRELUDE::*;
+USE ANCHOR_SPL::TOKEN::{MINT, TOKENACCOUNT, TOKEN}; // PRA LIDAR COM SPL TOKENS, INCLUINDO NOSSO AUSD!
+
+// ==============================================================================================
+// DECLARAÇÃO E REEXPORTAÇÃO DAS CRATES INTERNAS DO PROJETO AUSD!
+// ESSAS CRATES CONTÊM A LÓGICA MODULARIZADA DO SEU PROGRAMA, REPLICANDO A ARQUITETURA ARCIUM!
+// ==============================================================================================
+
+PUB MOD AUSD_TYPES;        // DEFINE TIPOS DE DADOS E CONTAS BÁSICAS (EX: PUBLICINPUTS, ETC.)!
+PUB MOD AUSD_DERIVE;       // MACROS DERIVE CUSTOMIZADAS!
+PUB MOD AUSD_PROC_MACROS;  // MACROS DE PROCEDIMENTO CUSTOMIZADAS (COMO `DECLARE_PROGRAM_ID`)!
+PUB MOD AUSD_PROC_MACRO_UTILS; // UTILITÁRIOS PARA AS MACROS DE PROCEDIMENTO!
+PUB MOD AUSD_COMPUTATION;  // COMPUTAÇÕES CRIPTOGRÁFICAS PESADAS (O CORAÇÃO DO ZK-SNARK), PORRA!
+PUB MOD AUSD_UTILS;        // UTILITÁRIOS GERAIS!
+
+// REEXPORTA PUBLICAMENTE OS MÓDULOS E SEUS CONTEÚDOS PRA FACILITAR O ACESSO!
+// ISSO PERMITE USAR STRUCTS E FUNÇÕES DIRETAMENTE (EX: `MERKLETREESTATE` EM VEZ DE `AUSD_TYPES::MERKLETREESTATE`)!
+PUB USE AUSD_TYPES::*;
+PUB USE AUSD_DERIVE::*;
+PUB USE AUSD_PROC_MACROS::*;
+PUB USE AUSD_PROC_MACRO_UTILS::*;
+PUB USE AUSD_COMPUTATION::*;
+PUB USE AUSD_UTILS::*;
+
+// ==============================================================================================
+// DECLARAÇÕES DE MÓDULOS ESPECÍFICOS DO PROGRAMA ANCHOR!
+// ESTES MÓDULOS CONTÊM A LÓGICA PRINCIPAL DE SUAS INSTRUÇÕES, CONTAS E ESTADO!
+// ==============================================================================================
+
+PUB MOD ACCOUNTS;   // DEFINE AS ESTRUTURAS DE CONTEXTO DE CONTAS (`#[DERIVE(ACCOUNTS)]`)!
+PUB MOD INSTRUCTIONS; // DEFINE AS ENUMS DE INSTRUÇÕES (SE FOR USAR O PADRÃO ARCIUM)!
+PUB MOD PROCESSOR;  // IMPLEMENTA A LÓGICA PARA CADA INSTRUÇÃO!
+PUB MOD STATE;      // DEFINE AS STRUCTS DE CONTAS DE ESTADO (`#[ACCOUNT]`)!
+PUB MOD PROOF;      // LÓGICA DE VERIFICAÇÃO DE ZK-PROOFS E MERKLE TREE!
+
+// REEXPORTA PUBLICAMENTE ESSES MÓDULOS TAMBÉM!
+PUB USE ACCOUNTS::*;
+PUB USE INSTRUCTIONS::*;
+PUB USE PROCESSOR::*;
+PUB USE STATE::*;
+PUB USE PROOF::*;
+
+// ==============================================================================================
+// PROGRAM ID E MACRO #![PROGRAM]!
+// DEFINE A PUBLIC KEY DO SEU PROGRAMA ON-CHAIN E O BLOCO DE INSTRUÇÕES ANCHOR!
+// ==============================================================================================
+
+// IMPORTANT: SUBSTITUA "SUA_NOVA_PROGRAM_ID_AQUI" PELA PUBLIC KEY REAL DO SEU PROGRAMA
+// APÓS O DEPLOY INICIAL (GERADA PELO ANCHOR CLI)! SE VOCÊ JÁ USOU "A6TAHA2YSPWN6VFHPMGMF8WNPB5TYCUVZOQKPMLVJRE"
+// ANTES, MANTENHA ESSA ID AQUI!
+DECLARE_ID!("A6TAha2ysPWN6vFHpZGMf8Wnqb5TyCuvzoQKpmLVjre");
+
+#[PROGRAM]
+PUB MOD AUSD_CONFIDENTIAL_PROGRAM {
+    USE SUPER::*;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // INSTRUÇÕES DE GERENCIAMENTO GERAL DO PROGRAMA (PLACEHOLDER)
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /// Inicializa o programa, incluindo o Merkle Tree e contas de estado globais.
+    /// Esta será a primeira instrução a ser chamada após o deploy.
+    ///
+    /// Contexto de Contas: `Initialize`
+    /// Argumentos: `tree_height` (altura da árvore Merkle, para `MerkleTreeState` ou `ProgramState`)
+    PUB FN INITIALIZE(CTX: CONTEXT<INITIALIZE>, TREE_HEIGHT: U32) -> RESULT<()> {
+        MSG!("PROGRAMA AUSD CONFIDENCIAL INICIALIZADO!");
+        // A LÓGICA DE INICIALIZAÇÃO DO ESTADO GLOBAL DO PROGRAMA SERÁ IMPLEMENTADA EM `PROCESSOR/INITIALIZE.RS`.
+        // EX: `CTX.ACCOUNTS.PROGRAM_STATE_ACCOUNT.INITIALIZE_STATE(TREE_HEIGHT)?;`
+        // EX: `CTX.ACCOUNTS.MERKLE_TREE_STATE.INITIALIZE_TREE(TREE_HEIGHT)?;`
+        OK(())
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // INSTRUÇÕES DE CONFIDENCIALIDADE (PLACEHOLDERS, INSPIRADAS NA ARCIUM)
+    // -----------------------------------------------------------------------------------------------------------------
+
+    /// Permite que um usuário mova aUSD de uma conta SPL transparente para um saldo confidencial.
+    /// Um 'compromisso' é gerado e adicionado ao Merkle Tree.
+    ///
+    /// Contexto de Contas: `DepositPrivate`
+    /// Argumentos: `amount` (quantidade a ser depositada), `commitment` (o hash do compromisso)
+    PUB FN DEPOSIT_PRIVATE(CTX: CONTEXT<DEPOSITPRIVATE>, AMOUNT: U64, COMMITMENT: [U8; 32]) -> RESULT<()> {
+        MSG!("DEPÓSITO CONFIDENCIAL DE {} AUSD COM COMPROMISSO {:?}!", AMOUNT, COMMITMENT);
+        // A LÓGICA DE DEPÓSITO CONFIDENCIAL (VERIFICAÇÃO, TRANSFERÊNCIA, ADIÇÃO AO MERKLE TREE)
+        // SERÁ IMPLEMENTADA NO MÓDULO `PROCESSOR`.
+        OK(())
+    }
+
+    /// Permite que um usuário transfira aUSD de seu saldo confidencial para outro usuário.
+    /// Isso envolve a verificação de uma ZK-proof e o uso de um nullifier.
+    ///
+    /// Contexto de Contas: `TransferPrivate`
+    /// Argumentos: `proof` (a prova ZK), `nullifier` (o hash do nullifier)
+    PUB FN TRANSFER_PRIVATE(CTX: CONTEXT<TRANSFERPRIVATE>, PROOF: VEC<U8>, NULLIFIER: [U8; 32]) -> RESULT<()> {
+        MSG!("TRANSFERÊNCIA CONFIDENCIAL COM NULLIFIER {:?}!", NULLIFIER);
+        // A LÓGICA DE TRANSFERÊNCIA CONFIDENCIAL (VERIFICAÇÃO DA PROVA ZK, REGISTRO DO NULLIFIER,
+        // MOVIMENTAÇÃO DE FUNDOS) SERÁ IMPLEMENTADA NO MÓDULO `PROCESSOR`.
+        OK(())
+    }
+
+    /// Permite que um usuário saque aUSD de seu saldo confidencial para uma conta SPL transparente.
+    /// Também envolve a verificação de uma ZK-proof e o uso de um nullifier.
+    ///
+    /// Contexto de Contas: `WithdrawPrivate`
+    /// Argumentos: `proof` (a prova ZK), `nullifier` (o hash do nullifier)
+    PUB FN WITHDRAW_PRIVATE(CTX: CONTEXT<WITHDRAWPRIVATE>, PROOF: VEC<U8>, NULLIFIER: [U8; 32]) -> RESULT<()> {
+        MSG!("SAQUE CONFIDENCIAL COM NULLIFIER {:?}!", NULLIFIER);
+        // A LÓGICA DE SAQUE CONFIDENCIAL (VERIFICAÇÃO DA PROVA ZK, REGISTRO DO NULLIFIER,
+        // TRANSFERÊNCIA DE FUNDOS) SERÁ IMPLEMENTADA NO MÓDULO `PROCESSOR`.
+        OK(())
+    }
+
+    // OUTRAS INSTRUÇÕES PODEM SER ADICIONADAS CONFORME O PROJETO EVOLUI.
+}
+
+// ==============================================================================================
+// ESTRUTURAS DE CONTEXTO DE CONTAS (ACCOUNT CONTEXTS) - PLACEHOLDERS!
+// ESTAS STRUCTS DEFINEM QUAIS CONTAS SÃO NECESSÁRIAS PARA CADA INSTRUÇÃO E SUAS PROPRIEDADES!
+// AS IMPLEMENTAÇÕES DETALHADAS (`#[ACCOUNT]`) SERÃO FEITAS EM `ACCOUNTS/MOD.RS`!
+// AS STRUCTS DE ESTADO (`PROGRAMSTATE`, `MERKLETREESTATE`, `NULLIFIERSTATE`) SERÃO DEFINIDAS EM `STATE/MOD.RS`!
+// ==============================================================================================
+
+/// Contexto de contas para a instrução `initialize`.
+#[DERIVE(ACCOUNTS)]
+#[INSTRUCTION(TREE_HEIGHT: U32)]
+PUB STRUCT INITIALIZE<'INFO> {
+    #[ACCOUNT(MUT)]
+    PUB INITIALIZER: SIGNER<'INFO>, // O SIGNATÁRIO QUE INICIALIZA O PROGRAMA.
+    
+    // CONTA DE ESTADO GLOBAL DO PROGRAMA (PDA).
+    #[ACCOUNT(
+        INIT,
+        PAYER = INITIALIZER,
+        SPACE = 8 + 32 + 1 + 4, // EXEMPLO DE ESPAÇO: DISCRIMINATOR + ROOT + BUMP + TREE_HEIGHT.
+        SEEDS = [B"PROGRAM_STATE_SEED"],
+        BUMP
+    )]
+    PUB PROGRAM_STATE_ACCOUNT: ACCOUNT<'INFO, PROGRAMSTATE>, 
+    
+    // CONTA DO MERKLE TREE (PDA).
+    #[ACCOUNT(
+        INIT,
+        PAYER = INITIALIZER,
+        SPACE = 8 + (128 * 32) + 32 + 1, // EXEMPLO DE ESPAÇO PARA 128 FOLHAS: DISCRIMINATOR + LEAVES + ROOT + BUMP.
+        SEEDS = [B"MERKLE_TREE_STATE_SEED"], // USANDO SEED DIFERENTE PARA MERKLETREESTATE.
+        BUMP
+    )]
+    PUB MERKLE_TREE_ACCOUNT: ACCOUNT<'INFO, MERKLETREESTATE>, 
+
+    PUB SYSTEM_PROGRAM: PROGRAM<'INFO, SYSTEM>, // PROGRAMA DO SISTEMA SOLANA.
+}
+
+/// Contexto de contas para a instrução `deposit_private`.
+#[DERIVE(ACCOUNTS)]
+PUB STRUCT DEPOSITPRIVATE<'INFO> {
+    #[ACCOUNT(MUT)]
+    PUB DEPOSITOR: SIGNER<'INFO>, // O USUÁRIO QUE ESTÁ DEPOSITANDO.
+    #[ACCOUNT(MUT)]
+    PUB FROM_TOKEN_ACCOUNT: ACCOUNT<'INFO, TOKENACCOUNT>, // CONTA SPL DE ORIGEM.
+    #[ACCOUNT(MUT)]
+    PUB TOKEN_MINT: ACCOUNT<'INFO, MINT>, // MINT DO TOKEN AUSD.
+
+    // POOL DE TOKENS CONFIDENCIAIS DO PROGRAMA (PDA).
+    #[ACCOUNT(
+        MUT,
+        SEEDS = [B"CONFIDENTIAL_POOL_SEED", TOKEN_MINT.KEY().AS_REF()], 
+        BUMP
+    )]
+    PUB CONFIDENTIAL_TOKEN_POOL: ACCOUNT<'INFO, TOKENACCOUNT>, 
+
+    // CONTA DO MERKLE TREE.
+    #[ACCOUNT(MUT, SEEDS = [B"MERKLE_TREE_STATE_SEED"], BUMP = MERKLETREE_ACCOUNT.BUMP)] 
+    PUB MERKLE_TREE_ACCOUNT: ACCOUNT<'INFO, MERKLETREESTATE>, 
+
+    PUB TOKEN_PROGRAM: PROGRAM<'INFO, TOKEN>, // PROGRAMA SPL TOKEN.
+    PUB SYSTEM_PROGRAM: PROGRAM<'INFO, SYSTEM>, // PROGRAMA DO SISTEMA SOLANA.
+}
+
+/// Contexto de contas para a instrução `transfer_private`.
+#[DERIVE(ACCOUNTS)]
+#[INSTRUCTION(NULLIFIER_SEED: [U8; 32])]
+PUB STRUCT TRANSFERPRIVATE<'INFO> {
+    #[ACCOUNT(MUT)]
+    PUB FEE_PAYER: SIGNER<'INFO>, // PAGADOR DA TAXA.
+    
+    // CONTA DO MERKLE TREE.
+    #[ACCOUNT(MUT, SEEDS = [B"MERKLE_TREE_STATE_SEED"], BUMP = MERKLETREE_ACCOUNT.BUMP)]
+    PUB MERKLE_TREE_ACCOUNT: ACCOUNT<'INFO, MERKLETREESTATE>, 
+    
+    // CONTA PARA O NULLIFIER (PDA).
+    #[ACCOUNT(
+        INIT_IF_NEEDED,
+        PAYER = FEE_PAYER,
+        SPACE = 8 + 32 + 1, // DISCRIMINATOR + NULLIFIER HASH + BUMP.
+        SEEDS = [B"NULLIFIER_SEED", NULLIFIER_SEED.AS_REF()], // USAR SEED PARA O NULLIFIER
+        BUMP
+    )]
+    PUB NULLIFIER_ACCOUNT: ACCOUNT<'INFO, NULLIFIERSTATE>, 
+
+    #[ACCOUNT(MUT)]
+    PUB CONFIDENTIAL_TOKEN_POOL: ACCOUNT<'INFO, TOKENACCOUNT>, // POOL DE TOKENS CONFIDENCIAIS.
+
+    /// CHECK: RECIPIENT PODE SER SPL OU PDA.
+    #[ACCOUNT(MUT)]
+    PUB RECIPIENT_TOKEN_ACCOUNT: ACCOUNTINFO<'INFO>, 
+    
+    PUB TOKEN_PROGRAM: PROGRAM<'INFO, TOKEN>,
+    PUB SYSTEM_PROGRAM: PROGRAM<'INFO, SYSTEM>,
+}
+
+/// Contexto de contas para a instrução `withdraw_private`.
+#[DERIVE(ACCOUNTS)]
+#[INSTRUCTION(NULLIFIER_SEED: [U8; 32])]
+PUB STRUCT WITHDRAWPRIVATE<'INFO> {
+    #[ACCOUNT(MUT)]
+    PUB WITHDRAWER: SIGNER<'INFO>, // USUÁRIO SACANDO.
+    #[ACCOUNT(MUT)]
+    PUB TO_TOKEN_ACCOUNT: ACCOUNT<'INFO, TOKENACCOUNT>, // CONTA SPL DE DESTINO.
+    #[ACCOUNT(MUT)]
+    PUB TOKEN_MINT: ACCOUNT<'INFO, MINT>, // MINT DO TOKEN AUSD.
+    #[ACCOUNT(MUT)]
+    PUB CONFIDENTIAL_TOKEN_POOL: ACCOUNT<'INFO, TOKENACCOUNT>, // POOL DE TOKENS CONFIDENCIAIS.
+    
+    // CONTA DO MERKLE TREE.
+    #[ACCOUNT(MUT, SEEDS = [B"MERKLE_TREE_STATE_SEED"], BUMP = MERKLETREE_ACCOUNT.BUMP)]
+    PUB MERKLE_TREE_ACCOUNT: ACCOUNT<'INFO, MERKLETREESTATE>,
+    
+    // CONTA PARA O NULLIFIER (PDA).
+    #[ACCOUNT(
+        INIT_IF_NEEDED,
+        PAYER = WITHDRAWER,
+        SPACE = 8 + 32 + 1, // DISCRIMINATOR + NULLIFIER HASH + BUMP.
+        SEEDS = [B"NULLIFIER_SEED", NULLIFIER_SEED.AS_REF()],
+        BUMP
+    )]
+    PUB NULLIFIER_ACCOUNT: ACCOUNT<'INFO, NULLIFIERSTATE>, 
+
+    PUB TOKEN_PROGRAM: PROGRAM<'INFO, TOKEN>,
+    PUB SYSTEM_PROGRAM: PROGRAM<'INFO, SYSTEM>,
+}
+
+// ==============================================================================================
+// ESTRUTURAS DE ESTADO (ACCOUNT STRUCTS) - PLACEHOLDERS!
+// ESTAS STRUCTS DEFINEM COMO OS DADOS SERÃO ARMAZENADOS ON-CHAIN.
+// AS IMPLEMENTAÇÕES DETALHADAS SERÃO FEITAS EM `STATE/MOD.RS`!
+// ==============================================================================================
+
+/// Estrutura para o estado global do programa (ex: raiz do Merkle Tree, configurações).
+#[ACCOUNT]
+PUB STRUCT PROGRAMSTATE {
+    PUB ROOT: [U8; 32], // A RAIZ ATUAL DO MERKLE TREE (EXEMPLO DE CAMPO).
+    PUB BUMP: U8,       // BUMP SEED PARA O PDA DA CONTA.
+    PUB TREE_HEIGHT: U32, // ALTURA DA ÁRVORE MERKLE (PARA CÁLCULO DE ESPAÇO E LÓGICA).
+    // OUTROS CAMPOS DE CONFIGURAÇÃO GLOBAL, SE NECESSÁRIO.
+}
+
+/// Estrutura para o estado do Merkle Tree.
+/// Para o MVP (com base na ideia de 128 folhas), armazenaremos um número limitado de folhas e a raiz.
+#[ACCOUNT]
+PUB STRUCT MERKLETREESTATE {
+    PUB LEAVES: VEC<[U8; 32]>, // LISTA DE FOLHAS (COMPROMISSOS), LIMITADA PARA CABER NA CONTA.
+    PUB ROOT: [U8; 32],        // A RAIZ ATUAL DO MERKLE TREE.
+    PUB BUMP: U8,              // BUMP SEED PARA O PDA DA CONTA.
+}
+
+/// Estrutura para armazenar um nullifier (marcador de que um compromisso foi gasto).
+#[ACCOUNT]
+PUB STRUCT NULLIFIERSTATE {
+    PUB NULLIFIER_HASH: [U8; 32], // O HASH DO NULLIFIER.
+    PUB BUMP: U8,                  // BUMP SEED PARA O PDA DA CONTA.
+}
+
+// ==============================================================================================
+// ERROS PERSONALIZADOS!
+// DEFINIDOS NO PROGRAMA PARA TRATAMENTO DE ERROS MAIS ESPECÍFICOS!
+// ==============================================================================================
+#[ERROR_CODE]
+PUB ENUM ERRORCODE {
+    #[MSG("MERKLE TREE IS FULL, NO MORE DEPOSITS ALLOWED.")]
+    MERKLETREEFULL,
+    #[MSG("MERKLE TREE OPERATION FAILED.")]
+    MERKLETREEERROR,
+    #[MSG("INVALID MERKLE PROOF PROVIDED.")]
+    INVALIDMERKLEPROOF,
+    #[MSG("ACCOUNT STATE IS INVALID FOR THIS OPERATION.")]
+    INVALIDACCOUNTSTATE,
+    #[MSG("INVALID FEE VERSION PROVIDED.")]
+    INVALIDFEEVERSION,
+    #[MSG("INSUFFICIENT FEE PROVIDED.")]
+    INVALIDFEE,
+    #[MSG("INVALID RECIPIENT ADDRESS.")]
+    INVALIDRECIPIENT,
+    #[MSG("INVALID AMOUNT PROVIDED.")]
+    INVALIDAMOUNT,
+    #[MSG("COMPUTATION IS NOT YET FINISHED.")]
+    COMPUTATIONISNOTYETFINISHED,
+    #[MSG("COMPUTATION IS ALREADY FINISHED.")]
+    COMPUTATIONISALREADYFINISHED,
+    #[MSG("INPUTS MISMATCH THE EXPECTED VALUES.")]
+    INPUTSMISMATCH,
+    #[MSG("INVALID MERKLE ROOT PROVIDED.")]
+    INVALIDMERKLEROOT,
+    #[MSG("INVALID RECENT COMMITMENT INDEX.")]
+    INVALIDRECENTCOMMITMENTINDEX,
+    #[MSG("COULD NOT INSERT NULLIFIER, IT MIGHT BE A DUPLICATE.")]
+    COULDNOTINSERTNULLIFIER,
+    #[MSG("QUEUE IS FULL, CANNOT ADD MORE ELEMENTS.")]
+    QUEUEISFULL,
+    #[MSG("INVALID OTHER INSTRUCTION IN TRANSACTION.")]
+    INVALIDOTHERINSTRUCTION,
+    #[MSG("FEATURE IS NOT YET AVAILABLE.")]
+    FEATURENOTAVAILABLE,
+}

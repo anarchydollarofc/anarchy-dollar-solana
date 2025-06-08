@@ -1,0 +1,22 @@
+# Caminho: shared/ausd-proc-macros/Cargo.toml
+# Crate de macros de procedimento customizadas para o projeto aUSD.
+
+[package]
+name = "ausd-proc-macros"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+mainnet = ["ausd-proc-macro-utils/mainnet"]
+devnet = ["ausd-proc-macro-utils/devnet"]
+
+[dependencies]
+# Dependências conforme o monorepo Arcium, adaptadas para aUSD
+ausd-computation = { path = "../ausd-computation", features = ["compute-unit-optimization"] } # Dependência local
+ausd-proc-macro-utils = { path = "../ausd-proc-macro-utils" } # Dependência local
+proc-macro2 = "1.0.36" # Versão Arcium
+quote = "1.0.16"      # Versão Arcium
+serde = { version = "1.0.188", features = ["derive"] } # Versão Arcium
+syn = { version = "1.0.89", features = ["full", "fold"] } # Versão Arcium
+toml = "0.5.9"        # Versão Arcium

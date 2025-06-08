@@ -1,0 +1,23 @@
+# Caminho: shared/ausd-computation/Cargo.toml
+# Crate para computações criptográficas pesadas para o projeto aUSD.
+
+[package]
+name = "ausd-computation"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+compute-unit-optimization = []
+
+[dependencies]
+# Dependências Arkworks para ZK-SNARKs (alinhadas com 0.4.0 da Arcium).
+ark-bn254 = { version = "0.4.0", default-features = false }
+ark-ec = { version = "0.4.0", default-features = false }
+ark-ff = { version = "0.4.0", default-features = false }
+ark-poly = { version = "0.4.0", default-features = false }
+ark-relations = { version = "0.4.0", default-features = false }
+
+# Outras dependências
+borsh = "0.10.3"        # Versão Arcium
+solana-program = "=1.18.26" # Versão Arcium

@@ -1,0 +1,22 @@
+# Caminho: shared/ausd-utils/Cargo.toml
+# Crate de utilitários gerais para o projeto aUSD.
+
+[package]
+name = "ausd-utils"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+default = []
+computation = ["ausd-computation"]
+sdk = ["solana-sdk", "ausd-computation"]
+test-unit = []
+
+[dependencies]
+# Dependências conforme o monorepo Arcium, adaptadas para aUSD
+borsh = "0.10.3"        # Versão Arcium
+ausd-types = { path = "../ausd-types", default-features = false, features = ["accounts", "bytes"] } # Dependência local
+ausd-computation = { path = "../ausd-computation", optional = true } # Dependência local (opcional)
+solana-program = "=1.18.26" # Versão Arcium
+solana-sdk = { version = "1.18.26", optional = true } # Versão Arcium
