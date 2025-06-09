@@ -1,6 +1,5 @@
-# Caminho: /mnt/c/Users/Gabriel/solana_projects/ausd-confidential-program/programs/ausd-confidential-program/Cargo.toml
+# Caminho: /home/gabgmf/solana-projects/anarchy-dollar-solana/programs/ausd-confidential-program/Cargo.toml
 # Este é o Cargo.toml do seu PROGRAMA Anchor principal.
-# Ele define as configurações e dependências específicas do seu programa, incluindo as crates internas do aUSD.
 
 [package]
 name = "ausd-confidential-program"
@@ -22,7 +21,10 @@ idl-build = ["anchor-lang/idl-build"] # Necessário para gerar o IDL do Anchor.
 # Dependências do Anchor Framework - Alinhadas para compatibilidade com solana-program 1.18.26 (da Arcium).
 anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.29.0", features = ["token"] }
-solana-program = "=1.18.26" # Versão exata do solana-program usada pela Arcium.
+anchor-syn = "=0.29.0"
+
+[build-dependencies]
+anchor-syn = "=0.29.0"
 
 # Dependências Arkworks para ZK-SNARKs - Versões alinhadas com as da Arcium (0.4.0).
 ark-bn254 = { version = "0.4.0", default-features = false }
@@ -31,16 +33,14 @@ ark-ff = { version = "0.4.0", default-features = false }
 ark-groth16 = { version = "0.4.0", default-features = false }
 ark-poly = { version = "0.4.0", default-features = false }
 ark-relations = { version = "0.4.0", default-features = false }
-ark-serialize = { version = "0.4.2", default-features = false }
-ark-std = { version = "0.4.0", default-features = false }
+ark-serialize = { version = "0.4.2", default-features = false } # Arcium usa 0.4.2
+ark-std = { version = "0.4.0", default-features = false } # Arcium usa 0.4.0
 
 # Borsh - Versão alinhada com a Arcium.
 borsh = "0.10.3"
 
 # Outras dependências comuns (verificar se a Arcium usa e adicionar se necessário).
-clap = { version = "4.4.18", default-features = false, features = ["derive"] }
-rand_core = { version = "0.6.4", default-features = false }
-rand = { version = "0.8.5", default-features = false }
+# rand_core e rand foram removidos por questão de determinismo em on-chain.
 sha2 = { version = "0.10.6", default-features = false }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = { version = "1.0.111", default-features = false }
@@ -55,3 +55,24 @@ ausd-proc-macros = { path = "../../shared/ausd-proc-macros" }
 ausd-proc-macro-utils = { path = "../../shared/ausd-proc-macro-utils" }
 ausd-computation = { path = "../../shared/ausd-computation" }
 ausd-utils = { path = "../../shared/ausd-utils" }
+
+# ===============================================================
+# REMOVIDOS PERFIS DE BUILD - DEVEM ESTAR APENAS NA RAIZ DO WORKSPACE
+# ===============================================================
+# [profile.release]
+# opt-level = 3
+# lto = "thin"
+# codegen-units = 1
+# panic = "abort"
+# strip = true
+# overflow-checks = false
+
+# [profile.dev]
+#incremental = false
+# opt-level = 0
+# overflow-checks = true
+
+# [profile.test]
+#incremental = false
+# opt-level = 0
+# overflow-checks = true
